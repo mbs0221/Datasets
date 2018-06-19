@@ -14,16 +14,9 @@ function [ X, Y, C ] = bovw( T, opts )
     [D1, D2] = cellcat(C1, 2);
 % 原始数据集
     D = zscore(single(D1'));
-% 降维
-    if opts.pca == true
-        [~,SCORE,LATENT] = pca(full(D));
-        S = cumsum(LATENT)./sum(LATENT);
-        index = find(S>opts.percent);
-        Dr = SCORE(:,1:index(1));
-    end
 % 聚类
     tic;
-    [IDX, C] = kmeans(Dr, k);
+    [IDX, C] = kmeans(D, k);
     t = toc;
     fprintf('聚类时间：%.2f\n', t);
 % 构建X和Y
