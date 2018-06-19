@@ -1,16 +1,29 @@
-function [ X, Y, C ] = bovw( T, k )
+function [ X, Y, C ] = bovw( T, opts )
 %BOVW 此处显示有关此函数的摘要
 % Bag of Visual Word
 %   此处显示详细说明
+% 参数：
+%       T    数据集
+%    opts    参数
 
+% 聚类数目
+    k = opts.k;
+    
 % 特征集合
     [C1, C2] = cellcat(T, 1);
     [D1, D2] = cellcat(C1, 2);
-    
-% 聚类
+% 原始数据集
     D = zscore(single(D1'));
+% 降维
+    if opts.pca == true
+        [~,SCORE,LATENT] = pca(full(D));
+        S = cumsum(LATENT)./sum(LATENT);
+        index = find(S>opts.percent);
+        Dr = SCORE(:,1:index(1));
+    end
+% 聚类
     tic;
-    [IDX, C] = kmeans(D, k);
+    [IDX, C] = kmeans(Dr, k);
     t = toc;
     fprintf('聚类时间：%.2f\n', t);
 % 构建X和Y
